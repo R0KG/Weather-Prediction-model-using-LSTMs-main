@@ -1,73 +1,93 @@
-# Toronto Weather Forecasting System
+# Advanced Weather Forecasting System
 
-A deep learning-based weather prediction system that leverages LSTM neural networks to forecast multiple weather parameters simultaneously.
+A sophisticated deep learning system for multi-step weather prediction using bidirectional LSTM networks with enhanced architecture and training procedures.
 
-## Overview
+## Technical Architecture
 
-This project implements an advanced weather forecasting system that:
-- Takes historical weather data as input
-- Uses deep learning to identify patterns
-- Predicts multiple weather parameters for future time steps
-- Provides detailed visualization of predictions
+### Model Components
+- **Bidirectional LSTM**:
+  * Multi-layer architecture (2 layers)
+  * Layer normalization
+  * Residual connections
+  * Dropout regularization
+  * Advanced fully connected layers
 
-## Technical Details
+### Key Features
+- Multi-step prediction (6-hour forecast)
+- 24-hour lookback window
+- Separate feature/target normalization
+- Early stopping mechanism
+- Learning rate scheduling
+- Gradient clipping
+- Comprehensive metrics tracking
 
-### Data Processing
-The system processes weather data from `toronto_weather_data.csv`, which includes:
-- Multiple input features (temperature, humidity, etc.)
-- Historical weather measurements
-- Time-based information (month, day, hour)
+## Model Configuration
 
-### Model Architecture
-- Type: Multi-layer LSTM (Long Short-Term Memory)
-- Features:
-  * Multiple LSTM layers with dropout
-  * Dense output layers
-  * Multi-step prediction capability
-  * Configurable prediction horizon
-
-### Key Parameters
 ```python
-sequence_length = 10    # Past time steps used for prediction
-forecast_horizon = 6    # Future time steps to predict
-hidden_size = 50       # LSTM hidden layer size
-dropout_rate = 0.1     # Dropout for regularization
+CONFIG = {
+    "sequence_length": 24,     # Hours of historical data used
+    "forecast_horizon": 6,     # Hours to predict
+    "batch_size": 64,
+    "hidden_size": 128,
+    "num_layers": 2,
+    "dropout_rate": 0.2,
+    "learning_rate": 1e-3,
+    "weight_decay": 1e-4,
+    "num_epochs": 100,
+    "patience": 10,           # Early stopping patience
+    "validation_split": 0.2
+}
 ```
 
-### Performance Metrics
-The model's performance is evaluated using:
+## Data Processing Pipeline
+
+### Preprocessing
+1. **Data Loading**:
+   - Loads weather data from CSV
+   - Separates features and targets
+   - Applies independent normalization
+
+2. **Sequence Creation**:
+   - Sliding window approach
+   - Configurable sequence length
+   - Efficient numpy-based processing
+
+3. **Data Splitting**:
+   - 60% Training
+   - 20% Validation
+   - 20% Testing
+
+### Model Architecture
+```
+Input → Bidirectional LSTM → Layer Normalization → 
+Dense (256) → ReLU → Dropout → Dense (output) → 
+Reshape (forecast steps)
+```
+
+## Training Process
+
+### Optimization
+- **Optimizer**: AdamW with weight decay
+- **Learning Rate**: 1e-3 with scheduling
+- **Loss Function**: MSE
+- **Regularization**: 
+  * Dropout (20%)
+  * Weight decay (1e-4)
+  * Gradient clipping
+
+### Monitoring
+- Training/Validation loss tracking
+- Early stopping with patience
+- Model checkpointing
+- Learning rate adjustment
+
+## Performance Metrics
 - Root Mean Square Error (RMSE)
 - Mean Absolute Error (MAE)
 - R-squared (R²) coefficient
+- Per-variable prediction plots
 
-## Setup Instructions
-
-1. **Environment Setup**
-   ```bash
-   # Install required packages
-   pip install numpy pandas torch scikit-learn matplotlib
-   ```
-
-2. **Data Preparation**
-   - Place `toronto_weather_data.csv` in the project root
-   - Ensure data format matches expected schema
-
-3. **Running the Model**
-   ```bash
-   python weather_forecaster.py
-   ```
-
-## Output
-
-The system generates:
-1. Training progress metrics
-2. Prediction accuracy measurements
-3. Visualization plots comparing:
-   - Actual vs predicted values
-   - Training and testing performance
-   - Multi-step forecast accuracy
-
-## Dependencies
+## Requirements
 - Python 3.7+
 - PyTorch
 - NumPy
@@ -75,10 +95,38 @@ The system generates:
 - Scikit-learn
 - Matplotlib
 
+## Setup and Usage
+
+1. **Environment Setup**:
+   ```bash
+   pip install torch numpy pandas scikit-learn matplotlib
+   ```
+
+2. **Data Preparation**:
+   - Place `toronto_weather_data.csv` in project root
+   - Ensure data format matches expected schema
+
+3. **Running the Model**:
+   ```bash
+   python weather_forecaster.py
+   ```
+
+## Output Visualization
+- Time series plots for each target variable
+- Actual vs. predicted comparisons
+- Training/validation loss curves
+- Comprehensive metric reporting
+
 ## Project Structure
 ```
 .
-├── weather_forecaster.py    # Main model implementation
+├── weather_forecaster.py    # Main implementation
 ├── toronto_weather_data.csv # Dataset
 └── README.md               # Documentation
 ```
+
+## Model Artifacts
+- `best_model.pth`: Best model checkpoint
+- Training history
+- Performance metrics
+- Prediction visualizations
